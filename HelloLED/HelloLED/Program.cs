@@ -13,7 +13,7 @@ namespace HelloLED
         {
             // instantiate and run new meadow app
             _app = new App();
-            _app.Run();
+            Thread.Sleep(Timeout.Infinite);
         }
     }
 }

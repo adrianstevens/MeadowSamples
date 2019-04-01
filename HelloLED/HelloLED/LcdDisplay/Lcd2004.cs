@@ -1,15 +1,14 @@
-/*
+﻿/*
 Driver ported from http://wiki.sunfounder.cc/images/b/bb/LCD2004_for_Raspberry_Pi.zip
 For reference: http://wiki.sunfounder.cc/index.php?title=LCD2004_Module
 Brian Kim 5/5/2018
 */
 
 using System;
-using System.Diagnostics;
 using System.Threading;
 using Meadow.Hardware;
 
-namespace Meadow.Foundation.Displays.LCD
+namespace Meadow.Foundation.Displays.Lcd
 {
     public class Lcd2004 : ITextDisplay
     {
@@ -35,19 +34,54 @@ namespace Meadow.Foundation.Displays.LCD
 
         public TextDisplayConfig DisplayConfig { get; protected set; }
 
-        public Lcd2004(IDigitalPin RS, IDigitalPin E, IDigitalPin D4, IDigitalPin D5, IDigitalPin D6, IDigitalPin D7)
+        public Lcd2004(IIODevice device, IPin pinRS, IPin pinE, IPin pinD4, IPin pinD5, IPin pinD6, IPin pinD7, 
+            ushort rows = 4, ushort columns = 20)
         {
-            DisplayConfig = new TextDisplayConfig { Height = 4, Width = 20 };
+            DisplayConfig = new TextDisplayConfig { Height = rows, Width = columns };
 
-            LCD_RS = new DigitalOutputPort(RS);
-            LCD_E =  new DigitalOutputPort(E);
-            LCD_D4 = new DigitalOutputPort(D4);
-            LCD_D5 = new DigitalOutputPort(D5);
-            LCD_D6 = new DigitalOutputPort(D6);
-            LCD_D7 = new DigitalOutputPort(D7);
+            LCD_RS = device.CreateDigitalOutputPort(pinRS); 
+            LCD_E  = device.CreateDigitalOutputPort(pinE);
+            LCD_D4 = device.CreateDigitalOutputPort(pinD4);
+            LCD_D5 = device.CreateDigitalOutputPort(pinD5);
+            LCD_D6 = device.CreateDigitalOutputPort(pinD6);
+            LCD_D7 = device.CreateDigitalOutputPort(pinD7);
 
             Initialize();
         }
+
+        public Lcd2004(IDigitalOutputPort portRS,
+                        IDigitalOutputPort portE,
+                        IDigitalOutputPort portD4,
+                        IDigitalOutputPort portD5,
+                        IDigitalOutputPort portD6,
+                        IDigitalOutputPort portD7,
+                        ushort rows = 20, ushort columns = 4)
+        {
+            DisplayConfig = new TextDisplayConfig { Height = rows, Width = columns };
+
+            LCD_RS = portRS;
+            LCD_E = portE;
+            LCD_D4 = portD4;
+            LCD_D5 = portD5;
+            LCD_D6 = portD6;
+            LCD_D7 = portD7;
+        }
+
+    /*    public Lcd2004(MCP23008 mcp, ushort rows = 20, ushort columns = 4)
+        {
+            DisplayConfig = new TextDisplayConfig { Height = rows, Width = columns };
+
+            LCD_RS = mcp.CreateOutputPort(1, false);
+            LCD_E =  mcp.CreateOutputPort(2, false);
+            LCD_D4 = mcp.CreateOutputPort(3, false);
+            LCD_D5 = mcp.CreateOutputPort(4, false);
+            LCD_D6 = mcp.CreateOutputPort(5, false);
+            LCD_D7 = mcp.CreateOutputPort(6, false);
+
+            var lite = mcp.CreateOutputPort(7, true);
+
+            Initialize();
+        } */
 
         private void Initialize()
         {
@@ -161,7 +195,7 @@ namespace Meadow.Foundation.Displays.LCD
 
         public void SetBrightness(float brightness = 0.75F)
         {
-            Debug.Print("Set brightness not enabled");
+            Console.WriteLine("Set brightness not enabled");
         }
 
         public void SaveCustomCharacter(byte[] characterMap, byte address)

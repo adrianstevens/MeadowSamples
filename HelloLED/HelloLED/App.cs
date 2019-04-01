@@ -2,19 +2,19 @@
 using System.Threading;
 using Meadow;
 using Meadow.Devices;
-using Meadow.Foundation.Displays.LCD;
+using Meadow.Foundation.Displays.Lcd;
 using Meadow.Hardware;
 
 namespace HelloLED
 {
     class App : AppBase<F7Micro, App>
     {
-        private DigitalOutputPort redLed;
-        private DigitalOutputPort blueLed;
-        private DigitalOutputPort greenLed;
+        private IDigitalOutputPort redLed;
+        private IDigitalOutputPort blueLed;
+        private IDigitalOutputPort greenLed;
         private Lcd2004 display;
 
-        public override void Run()
+        public App ()
         {
             InitHardware();
             ToggleLeds();
@@ -22,12 +22,12 @@ namespace HelloLED
 
         public void InitHardware()
         {
-            redLed = new DigitalOutputPort(Device.Pins.OnboardLEDRed, false);
-            blueLed = new DigitalOutputPort(Device.Pins.OnboardLEDBlue, false);
-            greenLed = new DigitalOutputPort(Device.Pins.OnboardLEDGreen, false);
+            redLed =  Device.CreateDigitalOutputPort(Device.Pins.OnboardLEDRed, false);
+        //    blueLed = new DigitalOutputPort(Device.Pins.OnboardLEDBlue, false);
+      //      greenLed = new DigitalOutputPort(Device.Pins.OnboardLEDGreen, false);
 
-            display = new Lcd2004(Device.Pins.D05, Device.Pins.D07,
-                Device.Pins.D11, Device.Pins.D12, Device.Pins.D13, Device.Pins.D14);
+            display = new Lcd2004(App.Device, Device.Pins.D05, Device.Pins.D07,
+                Device.Pins.D08, Device.Pins.D09, Device.Pins.D10, Device.Pins.D11, 2, 16);
         }
 
         public void ToggleLeds()
@@ -47,6 +47,7 @@ namespace HelloLED
                 display.WriteLine("Red LED is " + (state ? "On" : "Off"), 1);
                 Thread.Sleep(200);
 
+                /*
                 greenLed.State = state;
                 display.ClearLine(2);
                 display.WriteLine("Green LED is " + (state ? "On" : "Off"), 2);
@@ -55,7 +56,7 @@ namespace HelloLED
                 blueLed.State = state;
                 display.ClearLine(3);
                 display.WriteLine("Blue LED is " + (state ? "On" : "Off"), 3);
-                Thread.Sleep(200);
+                Thread.Sleep(200);*/
             }
         }
     }
