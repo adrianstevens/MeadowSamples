@@ -8,12 +8,12 @@ namespace Tetris
         {
             public int X { get; set; }
             public int Y { get; set; }
-            public int Rotation { get; set; }
-            public int PieceType { get; set; }
+            public byte Rotation { get; set; }
+            public byte PieceType { get; set; }
 
             public void Rotate()
             {
-                Rotation = (Rotation += 1) % 4;
+                Rotation = (byte)((Rotation += 1) % 4);
             }
         }
         
@@ -24,7 +24,7 @@ namespace Tetris
         public int LinesCleared { get; private set; }
 
         public int Width { get; private set; } = 8;
-        public int Height { get; private set; } = 32;
+        public int Height { get; private set; } = 16;
 
         public byte[,] GameField { get; private set; }
 
@@ -62,8 +62,11 @@ namespace Tetris
                          0,0,0,0},
         };
 
-        public TetrisGame()
+        public TetrisGame(int width = 8, int height = 20)
         {
+            Width = width;
+            Height = height;
+
             Init();
             Reset();
         }
@@ -93,7 +96,7 @@ namespace Tetris
 
         Tetramino GetNewPiece()
         {
-            int index = rand.Next(6);
+            byte index = (byte)rand.Next(6);
 
             return new Tetramino()
             {
@@ -106,8 +109,8 @@ namespace Tetris
 
         public void OnLeft()
         {
-            if(CheckCollision(CurrentPiece.X - 1, CurrentPiece.Y, 
-                CurrentPiece.Rotation, Tetraminos[CurrentPiece.PieceType]) == false)
+            if(IsPositionValid(CurrentPiece.X - 1, CurrentPiece.Y, 
+                CurrentPiece.Rotation, Tetraminos[CurrentPiece.PieceType]) == true)
             {
                 CurrentPiece.X += -1;
             }
@@ -115,8 +118,8 @@ namespace Tetris
 
         public void OnRight()
         {
-            if (CheckCollision(CurrentPiece.X + 1, CurrentPiece.Y,
-                            CurrentPiece.Rotation, Tetraminos[CurrentPiece.PieceType]) == false)
+            if (IsPositionValid(CurrentPiece.X + 1, CurrentPiece.Y,
+                            CurrentPiece.Rotation, Tetraminos[CurrentPiece.PieceType]) == true)
             {
                 CurrentPiece.X += 1;
             }
@@ -124,32 +127,113 @@ namespace Tetris
 
         public void OnRotate()
         {
-            if (CheckCollision(CurrentPiece.X, CurrentPiece.Y,
-                                CurrentPiece.Rotation + 1, Tetraminos[CurrentPiece.PieceType]) == false)
+            var rotation = (CurrentPiece.Rotation + 1) % 4;
+
+            if (IsPositionValid(CurrentPiece.X, CurrentPiece.Y,
+                                rotation, Tetraminos[CurrentPiece.PieceType]) == true)
             {
-                CurrentPiece.Rotation = (CurrentPiece.Rotation + 1 ) % 4;
+                CurrentPiece.Rotate();
             }
         }
 
-        public void OnDown()
+        public void OnDown(bool setOnFail = false)
         {
-            if (CheckCollision(CurrentPiece.X, CurrentPiece.Y + 1,
-                                CurrentPiece.Rotation, Tetraminos[CurrentPiece.PieceType]) == false)
+            if (IsPositionValid(CurrentPiece.X, CurrentPiece.Y + 1,
+                                CurrentPiece.Rotation, Tetraminos[CurrentPiece.PieceType]) == true)
             {
                 CurrentPiece.Y += 1;
             }
+            else if(setOnFail)
+            {
+                SetPieceToField();
+                CheckForCompletedLines(CurrentPiece.Y);
+                CurrentPiece = GetNewPiece();
+
+                if (IsPositionValid(CurrentPiece.X, CurrentPiece.Y,
+                                CurrentPiece.Rotation, Tetraminos[CurrentPiece.PieceType]) == false)
+                {
+                    Console.WriteLine($"Game over: {LinesCleared} lines cleared");
+                    Reset(); //start a new game
+                }
+            }
         }
 
-        bool CheckCollision(int x, int y, int rotation, byte[] pieceData)
+        void SetPieceToField()
         {
+            Console.WriteLine("SetPieceToField");
+            for(int i = 0; i < 4; i++)
+            {
+                for (int j = 0; j < 4; j++)
+                {
+                    if(IsPieceLocationSet(i, j))
+                    {
+                        GameField[CurrentPiece.X + i, CurrentPiece.Y + j] = CurrentPiece.PieceType; 
+                    }
+                }
+            }
+        }
+
+        //we only need to check for lines where the current piece is
+        void CheckForCompletedLines(int yPos)
+        {
+            Console.WriteLine("Check for completed lines");
+            bool complete;
+            for(int j = 0; j < 4; j++)
+            {
+                complete = true;
+                for(int i = 0; i < Width; i++)
+                {
+                    if(IsGameFieldSet(i, j + yPos) == false)
+                    {
+                        complete = false;
+                        break;
+                    }
+                }
+                if(complete)
+                {
+                    Console.WriteLine("found completed line");
+                    ClearLine(j + yPos); //we're moving down so this is valid
+                }
+            }
+        }
+
+        void ClearLine(int yPos)
+        {
+            Console.WriteLine("ClearLine");
+            LinesCleared++;
+
+            for(int j = yPos; j > 0; j--)
+            {
+                for(int i = 0; i < Width; i++)
+                {   //should switch to an array of arrays so we can just assign vs copy 
+                    GameField[i, j] = GameField[i, j - 1];
+                }
+            }
+
+            //and clear the top line
+            for (int i = 0; i < Width; i++)
+            {
+                GameField[i, 0] = 0;
+            }
+        }
+
+        bool IsPositionValid(int x, int y, int rotation, byte[] pieceData)
+        {
+            //loop over every point in the tetramino data for the current piece
             for(int i = 0; i < 4; i++)
             {
                 for(int j = 0; j < 4; j++)
                 {
-                    if(IsGameFieldFree(x + i, y + j) == false && 
-                        IsLocationSet(i, j, rotation, pieceData))
+                    if(IsPieceLocationSet(i, j, rotation, pieceData))
                     {
-                        return false;
+                        if(x + i < 0 || x + i >= Width || y + j >= Height) //x bounds checking
+                        {
+                            return false;
+                        }
+                        if(IsGameFieldSet(x + i, y + j) == true)
+                        {
+                            return false;
+                        }
                     }
                 }
             }
@@ -157,17 +241,23 @@ namespace Tetris
             return true;
         }
 
-        public bool IsGameFieldFree(int x, int y)
+        public bool IsGameFieldSet(int x, int y)
         {
             if(x < 0 || x >= Width || y < 0 || y >= Height)
             {
-                return false;
+                return false; //we'll state out of bounds positions as set (i.e. not free)
             }
 
-            return GameField[x, y] == 0;
+            return GameField[x, y] != 0;
         }
 
-        public bool IsLocationSet(int x, int y, int rotation, byte[] pieceData)
+        //should flip to free to match game field code
+        public bool IsPieceLocationSet(int x, int y)
+        {
+            return IsPieceLocationSet(x, y, CurrentPiece.Rotation, Tetraminos[CurrentPiece.PieceType]);
+        }
+
+        public bool IsPieceLocationSet(int x, int y, int rotation, byte[] pieceData)
         {
             if (x < 0 || x > 3 || y < 0 || y > 3)
             {
@@ -184,7 +274,7 @@ namespace Tetris
                     return pieceData[15 - (y * 4) - x] == 1;
                 case 3:
                 default:
-                    return pieceData[3 + y + (x * 4)] == 1;
+                    return pieceData[3 - y + (x * 4)] == 1;
             }
         }
     }
