@@ -4,13 +4,12 @@ namespace Tetris
 {
     public class TetrisGame
     {
-        public struct Tetramino
+        public class Tetramino
         {
-            public int XPos { get; set; }
-            public int YPos { get; set; }
+            public int X { get; set; }
+            public int Y { get; set; }
             public int Rotation { get; set; }
             public int PieceType { get; set; }
-            public byte[] PieceData { get; set; }
 
             public void Rotate()
             {
@@ -18,7 +17,7 @@ namespace Tetris
             }
         }
         
-        public Tetramino CurrentPiece { get; private set; }
+        public Tetramino CurrentPiece { get; protected set; }
 
         public int Score { get; private set; }
         public int Level { get; private set; }
@@ -98,32 +97,47 @@ namespace Tetris
 
             return new Tetramino()
             {
-                XPos = 2,
-                YPos = 0,
+                X = 2,
+                Y = 0,
                 Rotation = 0,
                 PieceType = index,
-                PieceData = Tetraminos[index],
             };
         }
 
         public void OnLeft()
         {
-
+            if(CheckCollision(CurrentPiece.X - 1, CurrentPiece.Y, 
+                CurrentPiece.Rotation, Tetraminos[CurrentPiece.PieceType]) == false)
+            {
+                CurrentPiece.X += -1;
+            }
         }
 
         public void OnRight()
         {
-
+            if (CheckCollision(CurrentPiece.X + 1, CurrentPiece.Y,
+                            CurrentPiece.Rotation, Tetraminos[CurrentPiece.PieceType]) == false)
+            {
+                CurrentPiece.X += 1;
+            }
         }
 
         public void OnRotate()
         {
-
+            if (CheckCollision(CurrentPiece.X, CurrentPiece.Y,
+                                CurrentPiece.Rotation + 1, Tetraminos[CurrentPiece.PieceType]) == false)
+            {
+                CurrentPiece.Rotation = (CurrentPiece.Rotation + 1 ) % 4;
+            }
         }
 
-        public void OnDrop()
+        public void OnDown()
         {
-
+            if (CheckCollision(CurrentPiece.X, CurrentPiece.Y + 1,
+                                CurrentPiece.Rotation, Tetraminos[CurrentPiece.PieceType]) == false)
+            {
+                CurrentPiece.Y += 1;
+            }
         }
 
         bool CheckCollision(int x, int y, int rotation, byte[] pieceData)
@@ -132,14 +146,25 @@ namespace Tetris
             {
                 for(int j = 0; j < 4; j++)
                 {
-                    if(GameField[x,y] > 0 && IsLocationSet(i, j, rotation, pieceData))
+                    if(IsGameFieldFree(x + i, y + j) == false && 
+                        IsLocationSet(i, j, rotation, pieceData))
                     {
-                        return true;
+                        return false;
                     }
                 }
             }
 
             return true;
+        }
+
+        public bool IsGameFieldFree(int x, int y)
+        {
+            if(x < 0 || x >= Width || y < 0 || y >= Height)
+            {
+                return false;
+            }
+
+            return GameField[x, y] == 0;
         }
 
         public bool IsLocationSet(int x, int y, int rotation, byte[] pieceData)
