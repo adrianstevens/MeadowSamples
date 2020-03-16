@@ -80,7 +80,7 @@ namespace Tetris
         public void Reset ()
         {
             Score = 0;
-            Level = 0;
+            Level = 1;
             LinesCleared = 0;
 
             for(int x = 0; x < GameField.GetLength(0); x++)
@@ -109,8 +109,10 @@ namespace Tetris
 
         public void OnLeft()
         {
-            if(IsPositionValid(CurrentPiece.X - 1, CurrentPiece.Y, 
-                CurrentPiece.Rotation, Tetraminos[CurrentPiece.PieceType]) == true)
+            if(IsPositionValid(CurrentPiece.X - 1,
+                               CurrentPiece.Y, 
+                               CurrentPiece.Rotation,
+                               Tetraminos[CurrentPiece.PieceType]) == true)
             {
                 CurrentPiece.X += -1;
             }
@@ -118,8 +120,10 @@ namespace Tetris
 
         public void OnRight()
         {
-            if (IsPositionValid(CurrentPiece.X + 1, CurrentPiece.Y,
-                            CurrentPiece.Rotation, Tetraminos[CurrentPiece.PieceType]) == true)
+            if (IsPositionValid(CurrentPiece.X + 1,
+                                CurrentPiece.Y,
+                                CurrentPiece.Rotation,
+                                Tetraminos[CurrentPiece.PieceType]) == true)
             {
                 CurrentPiece.X += 1;
             }
@@ -129,8 +133,10 @@ namespace Tetris
         {
             var rotation = (CurrentPiece.Rotation + 1) % 4;
 
-            if (IsPositionValid(CurrentPiece.X, CurrentPiece.Y,
-                                rotation, Tetraminos[CurrentPiece.PieceType]) == true)
+            if (IsPositionValid(CurrentPiece.X,
+                                CurrentPiece.Y,
+                                rotation,
+                                Tetraminos[CurrentPiece.PieceType]) == true)
             {
                 CurrentPiece.Rotate();
             }
@@ -150,8 +156,10 @@ namespace Tetris
                 CurrentPiece = GetNewPiece();
 
                 //check for endgame state
-                if (IsPositionValid(CurrentPiece.X, CurrentPiece.Y,
-                                CurrentPiece.Rotation, Tetraminos[CurrentPiece.PieceType]) == false)
+                if (IsPositionValid(CurrentPiece.X,
+                                    CurrentPiece.Y,
+                                    CurrentPiece.Rotation,
+                                    Tetraminos[CurrentPiece.PieceType]) == false)
                 {
                     Console.WriteLine($"Game over: {LinesCleared} lines cleared");
                     Reset(); //start a new game
@@ -161,20 +169,15 @@ namespace Tetris
 
         void SetPieceToField()
         {
-            Console.WriteLine("SetPieceToField");
-            for(int i = 0; i < 4; i++)
-            {
-                for (int j = 0; j < 4; j++)
-                {
-                    if(IsPieceLocationSet(i, j))
-                    {   
+            for(int i = 0; i < 4; i++) {
+                for (int j = 0; j < 4; j++) {
+                    if(IsPieceLocationSet(i, j)) {   
                         GameField[CurrentPiece.X + i, CurrentPiece.Y + j] = 1; 
                     }
                 }
             }
         }
 
-        //we only need to check for lines where the current piece is
         void CheckForCompletedLines(int yPos)
         {
             Console.WriteLine("Check for completed lines");
@@ -192,7 +195,6 @@ namespace Tetris
                 }
                 if(complete)
                 {
-                    Console.WriteLine("found completed line");
                     ClearLine(j + yPos); //we're moving down so this is valid
                 }
             }
@@ -202,6 +204,11 @@ namespace Tetris
         {
             Console.WriteLine("ClearLine");
             LinesCleared++;
+
+            if(LinesCleared % 10 == 0)
+            {
+                Level++;
+            }
 
             for(int j = yPos; j > 0; j--)
             {
@@ -269,12 +276,9 @@ namespace Tetris
 
             switch (rotation % 4)
             {
-                case 0:
-                    return pieceData[y * 4 + x] == 1;
-                case 1:
-                    return pieceData[12 + y - (x * 4)] == 1;
-                case 2:
-                    return pieceData[15 - (y * 4) - x] == 1;
+                case 0: return pieceData[y * 4 + x] == 1;
+                case 1: return pieceData[12 + y - (x * 4)] == 1;
+                case 2: return pieceData[15 - (y * 4) - x] == 1;
                 case 3:
                 default:
                     return pieceData[3 - y + (x * 4)] == 1;
