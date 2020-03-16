@@ -149,6 +149,7 @@ namespace Tetris
                 CheckForCompletedLines(CurrentPiece.Y);
                 CurrentPiece = GetNewPiece();
 
+                //check for endgame state
                 if (IsPositionValid(CurrentPiece.X, CurrentPiece.Y,
                                 CurrentPiece.Rotation, Tetraminos[CurrentPiece.PieceType]) == false)
                 {
@@ -166,8 +167,8 @@ namespace Tetris
                 for (int j = 0; j < 4; j++)
                 {
                     if(IsPieceLocationSet(i, j))
-                    {
-                        GameField[CurrentPiece.X + i, CurrentPiece.Y + j] = CurrentPiece.PieceType; 
+                    {   
+                        GameField[CurrentPiece.X + i, CurrentPiece.Y + j] = 1; 
                     }
                 }
             }
@@ -251,12 +252,14 @@ namespace Tetris
             return GameField[x, y] != 0;
         }
 
-        //should flip to free to match game field code
+        //relative to tetramino, not game field
         public bool IsPieceLocationSet(int x, int y)
         {
             return IsPieceLocationSet(x, y, CurrentPiece.Rotation, Tetraminos[CurrentPiece.PieceType]);
         }
 
+
+        //relative to tetramino, not game field
         public bool IsPieceLocationSet(int x, int y, int rotation, byte[] pieceData)
         {
             if (x < 0 || x > 3 || y < 0 || y > 3)

@@ -30,7 +30,7 @@ namespace Tetris
         IDigitalInputPort portRight;
         IDigitalInputPort portDown;
 
-        TetrisGame game = new TetrisGame(8, 20);
+        TetrisGame game = new TetrisGame(8, 16);
 
         public MeadowApp()
         {
@@ -39,7 +39,8 @@ namespace Tetris
             Init();
 
             graphics.Clear();
-            graphics.DrawText(0, 0, "Tetris");
+            graphics.DrawText(0, 0, "Meadow Tetris");
+            graphics.DrawText(0, 10, "v0.0.1");
             graphics.Show();
 
             Thread.Sleep(1000);
@@ -78,7 +79,7 @@ namespace Tetris
             while(playing)
             {
                 tick++;
-                if(tick % 30 == 0)
+                if(tick % 15 == 0)
                 {
                     game.OnDown(true);
                 }
@@ -112,7 +113,7 @@ namespace Tetris
             }
         }
 
-        int scale = 6;
+        int scale = 8;
         void DrawTetrisField()
         {
          //   graphics.Clear();
@@ -185,7 +186,7 @@ namespace Tetris
             );
 
             graphics = new GraphicsLibrary(display);
-            graphics.CurrentFont = new Font12x16();
+            graphics.CurrentFont = new Font4x8();
             graphics.Rotation = GraphicsLibrary.RotationType._270Degrees;
         }
 
