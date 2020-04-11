@@ -1,44 +1,44 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Connect4
+﻿namespace Connect4
 {
     class Connect4Game
     {
-        public byte Width => 7;
-        public byte Height => 6;
-
-        public byte[,] GameField { get; private set; }
-
-        public GameStateType GameState { get; private set; };
-
         public enum GameStateType
         {
             Player1Turn,
-            PLayer2Turn,
+            Player2Turn,
             Player1Wins,
             Player2Wins,
             Draw,
         };
 
-        public Connect4Game()
+        public byte Width { get; private set; }
+        public byte Height { get; private set; }
+
+        public int ChipsToWin { get; private set; }
+        
+        public byte[,] GameField { get; private set; }
+
+        public GameStateType GameState { get; private set; }
+
+        byte player1Value = 1;
+        byte player2Value = 2;
+
+        public Connect4Game(byte width = 7, byte height = 6, byte chipsToWin = 4)
         {
+            Width = width;
+            Height = height;
+            ChipsToWin = chipsToWin;
             Reset();
         }
 
         public bool AddChip(byte column)
         {
-
-
-            for(int i = 0; i < Height; i++)
+            for (int i = 0; i < Height; i++)
             {
-                if(GameField[i, column] != 0) { continue; }
+                if (GameField[i, column] != 0) { continue; }
                 {
-                    GameField[i, column] = (byte)((GameState == GameStateType.Player1Turn)?1:2);
-                    CheckGameState();
+                    GameField[i, column] = (GameState == GameStateType.Player1Turn) ? player1Value : player2Value;
+                    UpdateGameState();
                     return true;
                 }
             }
@@ -46,17 +46,124 @@ namespace Connect4
             return false;
         }
 
-        public void Reset ()
+        public void Reset()
         {
             GameField = new byte[Width, Height];
             GameState = GameStateType.Player1Turn;
         }
 
-        void CheckGameState()
+        void UpdateGameState()
         {
-
+            if (GameState == GameStateType.Player1Turn)
+            {
+                if (DidPlayerWin(player1Value))
+                {
+                    GameState = GameStateType.Player1Wins;
+                }
+                if (IsBoardFilled())
+                {
+                    GameState = GameStateType.Draw;
+                }
+                GameState = GameStateType.Player2Turn; //next turn
+            }
+            else if (GameState == GameStateType.Player2Turn)
+            {
+                if (DidPlayerWin(player2Value))
+                {
+                    GameState = GameStateType.Player2Wins;
+                }
+                if (IsBoardFilled())
+                {
+                    GameState = GameStateType.Draw;
+                }
+                GameState = GameStateType.Player1Turn; //next turn
+            }
+            else
+            {   //no change - game isn't active
+                return;
+            }
         }
 
+        bool DidPlayerWin(byte playerValue)
+        {
+            for(byte i = 0; i < Width; i++)
+            {
+                for(byte j = 0; j < Height; j++)
+                { //could optimize but the code is so simple it shouldn't matter
+                    if (IsHorizontalWin(playerValue, i, j)) { return true; }
+                    if (IsVerticalWin(playerValue, i, j)) { return true; }
+                    if (IsDiagonalUpWin(playerValue, i, j)) { return true; }
+                    if (IsDiagnonalDownWin(playerValue, i, j)) { return true; }
+                }
+            }
+            return false;
+        }
 
+        bool IsHorizontalWin(byte playerValue, byte xStart, byte y)
+        {
+            if(y >= Height) { return false; }
+
+            for(int i = 0; i < ChipsToWin; i++)
+            {
+                if(xStart + i >= Width) { return false; }
+
+                if(GameField[i + xStart, y] != playerValue) { return false; }
+            }
+            return true;
+        }
+
+        bool IsVerticalWin(byte playerValue, byte x, byte yStart)
+        {
+            if (x >= Width) { return false; }
+
+            for (int i = 0; i < ChipsToWin; i++)
+            {
+                if (yStart + i >= Height) { return false; }
+
+                if (GameField[x, i + yStart] != playerValue) { return false; }
+            }
+            return true;
+        }
+
+        bool IsDiagonalUpWin(byte playerValue, byte xStart, byte yStart)
+        {
+            for (int i = 0; i < ChipsToWin; i++)
+            {
+                if (xStart + i >= Width) { return false; }
+                if (yStart + i >= Height) { return false; }
+
+                if (GameField[i + xStart, i + yStart] != playerValue) { return false; }
+            }
+            return true;
+        }
+
+        bool IsDiagnonalDownWin(byte playerValue, byte xStart, byte yStart)
+        {
+            if(yStart < 3) { return false; }
+            if (yStart >= Height) { return false; }
+
+            for (int i = 0; i < ChipsToWin; i++)
+            {
+                if (xStart + i >= Width) { return false; }
+
+                if (GameField[i + xStart, i + yStart] != playerValue) { return false; }
+            }
+            return true;
+        }
+           
+        bool IsBoardFilled()
+        {
+            for(int i = 0; i < Width; i++)
+            {
+                for (int j = 0; j < Height; j++)
+                {
+                    if(GameField[i,j] == 0)
+                    {
+                        return false;
+                    }
+                }
+            }
+            return true;
+        }
     }
 }
