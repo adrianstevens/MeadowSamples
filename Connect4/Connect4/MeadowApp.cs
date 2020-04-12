@@ -2,17 +2,15 @@
 using System.Threading;
 using Meadow;
 using Meadow.Devices;
+using Meadow.Foundation.Audio;
 using Meadow.Foundation.Displays;
 using Meadow.Foundation.Graphics;
-using Meadow.Foundation.Leds;
 using Meadow.Hardware;
 
 namespace Connect4
 {
     public class MeadowApp : App<F7Micro, MeadowApp>
     {
-        RgbPwmLed onboardLed;
-
         Ssd1309 display;
         GraphicsLibrary graphics;
 
@@ -20,6 +18,8 @@ namespace Connect4
         IDigitalInputPort portRight;
         IDigitalInputPort portDown;
         IDigitalInputPort portReset;
+
+        PiezoSpeaker speaker;
 
         Connect4Game connectGame;
 
@@ -35,7 +35,7 @@ namespace Connect4
 
             graphics.Clear();
             graphics.DrawText(0, 0, "Meadow Span4!");
-            graphics.DrawText(0, 10, "v0.0.3");
+            graphics.DrawText(0, 10, "v0.0.4");
             graphics.Show();
 
             Thread.Sleep(250);
@@ -76,6 +76,8 @@ namespace Connect4
             else if (portDown.State == true)
             {
                 connectGame.AddChip(currentColumn);
+                speaker.PlayTone(440, 200);
+
             }
             else if(portReset.State == true)
             {
@@ -137,7 +139,6 @@ namespace Connect4
                 case Connect4Game.GameStateType.Player2Turn:
                     DrawPreviewChip(currentColumn, false);
                     break;
-
             }
 
             //Draw side display
@@ -177,17 +178,12 @@ namespace Connect4
         {
             Console.WriteLine("Initialize hardware...");
 
-            onboardLed = new RgbPwmLed(device: Device,
-                redPwmPin: Device.Pins.OnboardLedRed,
-                greenPwmPin: Device.Pins.OnboardLedGreen,
-                bluePwmPin: Device.Pins.OnboardLedBlue,
-                3.3f, 3.3f, 3.3f,
-                Meadow.Peripherals.Leds.IRgbLed.CommonType.CommonAnode);
-
             portLeft = Device.CreateDigitalInputPort(Device.Pins.D13);
             portRight = Device.CreateDigitalInputPort(Device.Pins.D11);
             portDown = Device.CreateDigitalInputPort(Device.Pins.D12);
             portReset = Device.CreateDigitalInputPort(Device.Pins.D07);
+
+            speaker = new PiezoSpeaker(Device.CreatePwmPort(Device.Pins.D05));
 
             var config = new SpiClockConfiguration(12000, SpiClockConfiguration.Mode.Mode0);
 
