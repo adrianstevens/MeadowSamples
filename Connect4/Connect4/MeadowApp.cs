@@ -52,7 +52,7 @@ namespace Connect4
                 DrawGame();
                 graphics.Show();
 
-                Thread.Sleep(50);
+                Thread.Sleep(250);
             }
         }
 
@@ -78,12 +78,66 @@ namespace Connect4
             }
         }
 
+        int CellSize = 9;
+        int yStart = 9;
+        int xStart = 0;
         void DrawGame()
         {
+            //draw gameboard
+            graphics.DrawRectangle(0, 9, 64, 55, true, false);
 
-            graphics.DrawText(0, 0, $"status");
+            for(int i = 1; i < 7; i++)
+            {
+                graphics.DrawLine(CellSize * i,
+                    yStart,
+                    CellSize * i,
+                    yStart + CellSize * 6 + 1,
+                    true);
+            }
 
-            graphics.DrawRectangle(6, 10, 52, 112);
+            for (int j = 1; j < 6; j++)
+            {
+                graphics.DrawLine(xStart,
+                    yStart + j*CellSize,
+                    64 + xStart,
+                    yStart + j * CellSize,
+                    true);
+            }
+
+            for (int x = 0; x < connectGame.Width; x++)
+            {
+                for (int y = 0; y < connectGame.Height; y++)
+                {
+                    DrawChip(x, y, false);
+                }
+            }
+
+            //Draw Text
+            int xText = 75; 
+            graphics.DrawText(xText, 0, "Connect4");
+
+            graphics.DrawText(xText, 18, "Player 1");
+
+            graphics.DrawText(xText, 27, "Player 2");
+
+            graphics.DrawText(xText, 45, "Score:");
+            graphics.DrawText(xText, 54, "3 to 5");
+
+
+
+            //     graphics.DrawText(0, 0, $"status");
+
+            //     graphics.DrawRectangle(6, 10, 52, 112);
+        }
+
+        void DrawChip(int column, int row, bool isFilled)
+        {
+            graphics.DrawCircle(xStart + column * CellSize + 4,
+                yStart + row * CellSize + 4,
+                3,
+                true,
+                isFilled);
+                
         }
 
         void Initialize()
@@ -115,7 +169,7 @@ namespace Connect4
             );
 
             graphics = new GraphicsLibrary(display);
-            graphics.CurrentFont = new Font8x12();
+            graphics.CurrentFont = new Font4x8();
         }
     }
 }
