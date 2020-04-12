@@ -8,6 +8,7 @@
     <PackageReference Include="Meadow.Foundation" Version="0.*" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Meadow.Foundation.Displays.Ssd1306" Version="0.12.3" />
+    <ProjectReference Include="..\Displays.GraphicsLibrary\Displays.GraphicsLibrary.csproj" />
+    <ProjectReference Include="..\Displays.Ssd1306\Displays.Ssd1306.csproj" />
   </ItemGroup>
 </Project>

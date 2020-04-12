@@ -15,6 +15,9 @@
         public byte Height { get; private set; }
 
         public int ChipsToWin { get; private set; }
+
+        public int Player1Wins { get; private set; }
+        public int Player2Wins { get; private set; }
         
         public byte[,] GameField { get; private set; }
 
@@ -33,11 +36,17 @@
 
         public bool AddChip(byte column)
         {
+            if(GameState != GameStateType.Player1Turn &&
+                GameState != GameStateType.Player2Turn)
+            {
+                return false;
+            }
+
             for (int i = 0; i < Height; i++)
             {
-                if (GameField[i, column] != 0) { continue; }
+                if (GameField[column, i] != 0) { continue; }
                 {
-                    GameField[i, column] = (GameState == GameStateType.Player1Turn) ? player1Value : player2Value;
+                    GameField[column, i] = (GameState == GameStateType.Player1Turn) ? player1Value : player2Value;
                     UpdateGameState();
                     return true;
                 }
@@ -59,24 +68,32 @@
                 if (DidPlayerWin(player1Value))
                 {
                     GameState = GameStateType.Player1Wins;
+                    Player1Wins++;
                 }
-                if (IsBoardFilled())
+                else if (IsBoardFilled())
                 {
                     GameState = GameStateType.Draw;
                 }
-                GameState = GameStateType.Player2Turn; //next turn
+                else
+                {
+                    GameState = GameStateType.Player2Turn; //next turn
+                }
             }
             else if (GameState == GameStateType.Player2Turn)
             {
                 if (DidPlayerWin(player2Value))
                 {
                     GameState = GameStateType.Player2Wins;
+                    Player2Wins++;
                 }
-                if (IsBoardFilled())
+                else if (IsBoardFilled())
                 {
                     GameState = GameStateType.Draw;
                 }
-                GameState = GameStateType.Player1Turn; //next turn
+                else
+                {
+                    GameState = GameStateType.Player1Turn; //next turn
+                }
             }
             else
             {   //no change - game isn't active

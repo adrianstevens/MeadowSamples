@@ -19,6 +19,7 @@ namespace Connect4
         IDigitalInputPort portLeft;
         IDigitalInputPort portRight;
         IDigitalInputPort portDown;
+        IDigitalInputPort portReset;
 
         Connect4Game connectGame;
 
@@ -26,18 +27,18 @@ namespace Connect4
 
         public MeadowApp()
         {
-            Console.WriteLine("Connect4");
+            Console.WriteLine("Span 4");
 
             connectGame = new Connect4Game();
 
             Initialize();
 
             graphics.Clear();
-            graphics.DrawText(0, 0, "Meadow Connect4");
-            graphics.DrawText(0, 10, "v0.0.1");
+            graphics.DrawText(0, 0, "Meadow Span 4");
+            graphics.DrawText(0, 10, "v0.0.2");
             graphics.Show();
 
-            Thread.Sleep(500);
+            Thread.Sleep(100);
 
             StartGameLoop();
         }
@@ -48,7 +49,7 @@ namespace Connect4
             {
                 CheckInput();
 
-                graphics.Clear();
+                graphics.Clear(false);
                 DrawGame();
                 graphics.Show();
 
@@ -76,11 +77,16 @@ namespace Connect4
             {
                 connectGame.AddChip(currentColumn);
             }
+            else if(portReset.State == true)
+            {
+                connectGame.Reset();
+            }
         }
 
         int CellSize = 9;
         int yStart = 9;
         int xStart = 0;
+
         void DrawGame()
         {
             //draw gameboard
@@ -99,7 +105,7 @@ namespace Connect4
             {
                 graphics.DrawLine(xStart,
                     yStart + j*CellSize,
-                    64 + xStart,
+                    63 + xStart,
                     yStart + j * CellSize,
                     true);
             }
@@ -108,36 +114,63 @@ namespace Connect4
             {
                 for (int y = 0; y < connectGame.Height; y++)
                 {
-                    DrawChip(x, y, false);
+                    if(connectGame.GameField[x,y] == 0) { continue; }
+                    DrawChipOnBoard(x, y, connectGame.GameField[x, y] == 1);
                 }
             }
 
-            //Draw Text
+            //Game state
+            switch(connectGame.GameState)
+            {
+                case Connect4Game.GameStateType.Draw:
+                    graphics.DrawText(2, 0, "Draw");
+                    break;
+                case Connect4Game.GameStateType.Player1Wins:
+                    graphics.DrawText(2, 0, "Player 1 Wins!");
+                    break;
+                case Connect4Game.GameStateType.Player2Wins:
+                    graphics.DrawText(2, 0, "Player 2 Wins!");
+                    break;
+                case Connect4Game.GameStateType.Player1Turn:
+                    DrawPreviewChip(currentColumn, true);
+                    break;
+                case Connect4Game.GameStateType.Player2Turn:
+                    DrawPreviewChip(currentColumn, false);
+                    break;
+
+            }
+
+            //Draw side display
             int xText = 75; 
-            graphics.DrawText(xText, 0, "Connect4");
+            graphics.DrawText(xText, 0, "Span4!");
 
             graphics.DrawText(xText, 18, "Player 1");
+            DrawChip(115, 21, true);
 
             graphics.DrawText(xText, 27, "Player 2");
+            DrawChip(115, 30, false);
 
             graphics.DrawText(xText, 45, "Score:");
-            graphics.DrawText(xText, 54, "3 to 5");
-
-
-
-            //     graphics.DrawText(0, 0, $"status");
-
-            //     graphics.DrawRectangle(6, 10, 52, 112);
+            graphics.DrawText(xText, 54, $"{connectGame.Player1Wins} to {connectGame.Player2Wins}");
         }
 
-        void DrawChip(int column, int row, bool isFilled)
+        void DrawPreviewChip(int column, bool isFilled)
         {
-            graphics.DrawCircle(xStart + column * CellSize + 4,
-                yStart + row * CellSize + 4,
-                3,
-                true,
+            DrawChip(xStart + column * CellSize + 5,
+                5,
                 isFilled);
-                
+        }
+
+        void DrawChipOnBoard(int column, int row, bool isFilled)
+        {
+            DrawChip(xStart + column * CellSize + 5,
+                yStart + (connectGame.Height - row - 1) * CellSize + 5,
+                isFilled);
+        }
+        void DrawChip(int xCenter, int yCenter, bool isFilled)
+        {
+            graphics.DrawCircle(xCenter, yCenter, 3,
+                            true, isFilled, true);
         }
 
         void Initialize()
@@ -151,9 +184,10 @@ namespace Connect4
                 3.3f, 3.3f, 3.3f,
                 Meadow.Peripherals.Leds.IRgbLed.CommonType.CommonAnode);
 
-            portLeft = Device.CreateDigitalInputPort(Device.Pins.D12);
-            portRight = Device.CreateDigitalInputPort(Device.Pins.D07);
-            portDown = Device.CreateDigitalInputPort(Device.Pins.D11);
+            portLeft = Device.CreateDigitalInputPort(Device.Pins.D13);
+            portRight = Device.CreateDigitalInputPort(Device.Pins.D11);
+            portDown = Device.CreateDigitalInputPort(Device.Pins.D12);
+            portReset = Device.CreateDigitalInputPort(Device.Pins.D07);
 
             var config = new SpiClockConfiguration(12000, SpiClockConfiguration.Mode.Mode0);
 
