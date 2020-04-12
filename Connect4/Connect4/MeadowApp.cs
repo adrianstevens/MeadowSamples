@@ -34,11 +34,11 @@ namespace Connect4
             Initialize();
 
             graphics.Clear();
-            graphics.DrawText(0, 0, "Meadow Span 4");
-            graphics.DrawText(0, 10, "v0.0.2");
+            graphics.DrawText(0, 0, "Meadow Span4!");
+            graphics.DrawText(0, 10, "v0.0.3");
             graphics.Show();
 
-            Thread.Sleep(100);
+            Thread.Sleep(250);
 
             StartGameLoop();
         }
@@ -53,7 +53,7 @@ namespace Connect4
                 DrawGame();
                 graphics.Show();
 
-                Thread.Sleep(250);
+                Thread.Sleep(100);
             }
         }
 

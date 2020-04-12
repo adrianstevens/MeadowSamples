@@ -144,26 +144,25 @@
 
         bool IsDiagonalUpWin(byte playerValue, byte xStart, byte yStart)
         {
+            if (xStart > Width - ChipsToWin) { return false; }
+            if (yStart > Height - ChipsToWin) { return false; }
+
             for (int i = 0; i < ChipsToWin; i++)
             {
-                if (xStart + i >= Width) { return false; }
-                if (yStart + i >= Height) { return false; }
-
-                if (GameField[i + xStart, i + yStart] != playerValue) { return false; }
+                if (GameField[xStart + i, yStart + i] != playerValue) { return false; }
             }
             return true;
         }
 
         bool IsDiagnonalDownWin(byte playerValue, byte xStart, byte yStart)
         {
-            if(yStart < 3) { return false; }
-            if (yStart >= Height) { return false; }
+            if (xStart > Width - ChipsToWin) { return false; }
+            if (yStart < 3) { return false; }
+            if (yStart >= Height) { return false; } //should never happen
 
             for (int i = 0; i < ChipsToWin; i++)
             {
-                if (xStart + i >= Width) { return false; }
-
-                if (GameField[i + xStart, i + yStart] != playerValue) { return false; }
+                if (GameField[xStart + i, yStart - i] != playerValue) { return false; }
             }
             return true;
         }
