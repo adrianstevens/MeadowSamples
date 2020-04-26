@@ -1,6 +1,6 @@
-﻿namespace Connect4
+﻿namespace Span4
 {
-    class Connect4Game
+    class Span4Game
     {
         public enum GameStateType
         {
@@ -26,7 +26,7 @@
         byte player1Value = 1;
         byte player2Value = 2;
 
-        public Connect4Game(byte width = 7, byte height = 6, byte chipsToWin = 4)
+        public Span4Game(byte width = 7, byte height = 6, byte chipsToWin = 4)
         {
             Width = width;
             Height = height;

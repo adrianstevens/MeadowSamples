@@ -1,7 +1,7 @@
 ﻿using Meadow;
 using System.Threading;
 
-namespace Connect4
+namespace Span4
 {
     class Program
     {

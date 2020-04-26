@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.29920.165
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Connect4", "Connect4\Connect4.csproj", "{D94EE404-CC5B-4CF2-8E20-3A1D8B1207FE}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Span4_SSD1309", "Connect4\Span4_SSD1309.csproj", "{D94EE404-CC5B-4CF2-8E20-3A1D8B1207FE}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Displays.GraphicsLibrary", "Displays.GraphicsLibrary\Displays.GraphicsLibrary.csproj", "{85AE27DA-C3EC-4EA7-A9BC-85C6805D5620}"
 EndProject

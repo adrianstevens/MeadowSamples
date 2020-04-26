@@ -7,7 +7,7 @@ using Meadow.Foundation.Displays;
 using Meadow.Foundation.Graphics;
 using Meadow.Hardware;
 
-namespace Connect4
+namespace Span4
 {
     public class MeadowApp : App<F7Micro, MeadowApp>
     {
@@ -21,7 +21,7 @@ namespace Connect4
 
         PiezoSpeaker speaker;
 
-        Connect4Game connectGame;
+        Span4Game connectGame;
 
         byte currentColumn = 0;
 
@@ -29,7 +29,7 @@ namespace Connect4
         {
             Console.WriteLine("Span 4");
 
-            connectGame = new Connect4Game();
+            connectGame = new Span4Game();
 
             Initialize();
 
@@ -53,7 +53,7 @@ namespace Connect4
                 DrawGame();
                 graphics.Show();
 
-                Thread.Sleep(100);
+                Thread.Sleep(150);
             }
         }
 
@@ -124,19 +124,19 @@ namespace Connect4
             //Game state
             switch(connectGame.GameState)
             {
-                case Connect4Game.GameStateType.Draw:
+                case Span4Game.GameStateType.Draw:
                     graphics.DrawText(2, 0, "Draw");
                     break;
-                case Connect4Game.GameStateType.Player1Wins:
+                case Span4Game.GameStateType.Player1Wins:
                     graphics.DrawText(2, 0, "Player 1 Wins!");
                     break;
-                case Connect4Game.GameStateType.Player2Wins:
+                case Span4Game.GameStateType.Player2Wins:
                     graphics.DrawText(2, 0, "Player 2 Wins!");
                     break;
-                case Connect4Game.GameStateType.Player1Turn:
+                case Span4Game.GameStateType.Player1Turn:
                     DrawPreviewChip(currentColumn, true);
                     break;
-                case Connect4Game.GameStateType.Player2Turn:
+                case Span4Game.GameStateType.Player2Turn:
                     DrawPreviewChip(currentColumn, false);
                     break;
             }
