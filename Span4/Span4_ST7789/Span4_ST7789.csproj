@@ -1,0 +1,19 @@
+<Project Sdk="Meadow.Sdk/1.1.0">
+  <PropertyGroup>
+    <TargetFramework>net472</TargetFramework>
+    <OutputType>Exe</OutputType>
+    <AssemblyName>App</AssemblyName>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="..\Span4_SSD1309\Span4Game.cs">
+      <Link>Span4Game.cs</Link>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Displays.TftSpi\Displays.TftSpi.csproj" />
+    <ProjectReference Include="..\Displays.GraphicsLibrary\Displays.GraphicsLibrary.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Meadow.Foundation" Version="0.14.1" />
+  </ItemGroup>
+</Project>

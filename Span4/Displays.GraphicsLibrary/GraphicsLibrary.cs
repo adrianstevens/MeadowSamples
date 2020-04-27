@@ -7,7 +7,7 @@ namespace Meadow.Foundation.Graphics
     /// <summary>
     ///     Provide high level graphics functions
     /// </summary>
-    public class GraphicsLibrary : ITextDisplay
+    public class GraphicsLibrary //: ITextDisplay
     {
         #region Member variables / fields
 
@@ -957,9 +957,9 @@ namespace Meadow.Foundation.Graphics
             Show();
         }
 
-        public void Clear()
+        public void ClearLines()
         {
-            Clear(true);
+            Clear(true); //for now
         }
 
         public void ClearLine(byte lineNumber)
@@ -978,11 +978,6 @@ namespace Meadow.Foundation.Graphics
         public void SaveCustomCharacter(byte[] characterMap, byte address)
         {
           //  throw new NotImplementedException();
-        }
-
-        public void SetBrightness(float brightness = 0.75F)
-        {
-            throw new NotImplementedException();
         }
 
         #endregion Display
