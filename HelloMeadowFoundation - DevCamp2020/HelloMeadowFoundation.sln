@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.30104.148
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HelloMeadowFoundation", "HelloMeadowFoundation\HelloMeadowFoundation.csproj", "{6F80413C-EFE4-4721-8A63-14F086676D72}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HelloMeadowFoundation", "MF\HelloMeadowFoundation.csproj", "{D1148DC4-034F-4E29-93CD-3375426E5384}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -11,17 +11,17 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{6F80413C-EFE4-4721-8A63-14F086676D72}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{6F80413C-EFE4-4721-8A63-14F086676D72}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{6F80413C-EFE4-4721-8A63-14F086676D72}.Debug|Any CPU.Deploy.0 = Debug|Any CPU
-		{6F80413C-EFE4-4721-8A63-14F086676D72}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{6F80413C-EFE4-4721-8A63-14F086676D72}.Release|Any CPU.Build.0 = Release|Any CPU
-		{6F80413C-EFE4-4721-8A63-14F086676D72}.Release|Any CPU.Deploy.0 = Release|Any CPU
+		{D1148DC4-034F-4E29-93CD-3375426E5384}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D1148DC4-034F-4E29-93CD-3375426E5384}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D1148DC4-034F-4E29-93CD-3375426E5384}.Debug|Any CPU.Deploy.0 = Debug|Any CPU
+		{D1148DC4-034F-4E29-93CD-3375426E5384}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D1148DC4-034F-4E29-93CD-3375426E5384}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D1148DC4-034F-4E29-93CD-3375426E5384}.Release|Any CPU.Deploy.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
-		SolutionGuid = {61981D0B-DE96-4C9B-9F0A-789636201EE1}
+		SolutionGuid = {94BC11F7-3ECA-4B02-BB26-70F30EC9E5D7}
 	EndGlobalSection
 EndGlobal
