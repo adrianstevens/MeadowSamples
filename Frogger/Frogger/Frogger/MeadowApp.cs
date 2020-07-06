@@ -5,7 +5,6 @@ using Meadow.Devices;
 using Meadow.Foundation.Displays;
 using Meadow.Foundation.Graphics;
 using Meadow.Foundation.Leds;
-using Meadow.Foundation.Sensors.Buttons;
 using Meadow.Hardware;
 
 namespace Frogger
@@ -15,17 +14,19 @@ namespace Frogger
         Ssd1309 display;
         GraphicsLibrary graphics;
 
-        PushButton buttonLeft;
-        PushButton buttonRight;
-        PushButton buttonUp;
-        PushButton buttonDown;
+        IDigitalInputPort portLeft;
+        IDigitalInputPort portUp;
+        IDigitalInputPort portRight;
+        IDigitalInputPort portDown;
+
+   //     AnalogJoystick joystick;
 
         RgbPwmLed onboardLed;
 
         FroggerGame frogger;
 
         //UI 
-        int cellSize = 8;
+        byte cellSize = 8;
 
         public MeadowApp()
         {
@@ -58,10 +59,10 @@ namespace Frogger
             graphics = new GraphicsLibrary(display);
             graphics.CurrentFont = new Font4x8();
 
-            buttonLeft = new PushButton(Device, Device.Pins.D13, ResistorMode.PullDown);
-            buttonRight = new PushButton(Device, Device.Pins.D12, ResistorMode.PullDown);
-            buttonUp = new PushButton(Device, Device.Pins.D11, ResistorMode.PullDown);
-            buttonDown = new PushButton(Device, Device.Pins.D08, ResistorMode.PullDown);
+            portLeft = Device.CreateDigitalInputPort(Device.Pins.D12, InterruptMode.None, ResistorMode.PullDown);
+            portUp = Device.CreateDigitalInputPort(Device.Pins.D13, InterruptMode.None, ResistorMode.PullDown);
+            portRight = Device.CreateDigitalInputPort(Device.Pins.D07, InterruptMode.None, ResistorMode.PullDown);
+            portDown = Device.CreateDigitalInputPort(Device.Pins.D11, InterruptMode.None, ResistorMode.PullDown);
 
             Console.WriteLine("Initialize hardware complete.");
         }
@@ -82,7 +83,7 @@ namespace Frogger
             while (true)
             {
                 frogger.Update();
-              //  CheckInput();
+                CheckInput();
                 graphics.Clear();
                 DrawBackground();
                 DrawLanes();
@@ -96,22 +97,38 @@ namespace Frogger
 
         void CheckInput()
         {
-            if(buttonUp.State == true)
+        /*    if(joystick.Position == AnalogJoystick.DigitalJoystickPosition.Up)
+            {
+                Console.WriteLine("Up");
+                frogger.OnUp();
+            }
+            else if(joystick.Position == AnalogJoystick.DigitalJoystickPosition.Left)
+            {
+                Console.WriteLine("Left");
+                frogger.OnLeft();
+            }
+            else if(joystick.Position == AnalogJoystick.DigitalJoystickPosition.Right)
+            {
+                Console.WriteLine("Right");
+                frogger.OnRight();
+            } */
+
+            if(portUp.State == true)
             {
                 frogger.OnUp();
             }
-            else if (buttonLeft.State == true)
+            else if (portLeft.State == true)
             {
                 frogger.OnLeft();
             }
-            else if (buttonRight.State == true)
+            else if (portRight.State == true)
             {
                 frogger.OnRight();
             }
-            else if (buttonDown.State == true)
+            else if (portDown.State == true)
             {
                 frogger.OnDown();
-            }
+            } 
         }
 
         void DrawBackground()
@@ -134,13 +151,11 @@ namespace Frogger
             int cellOffset;
             for (byte row = 0; row < 6; row++)
             {
-                startPos = (int)(frogger.GameTime * frogger.LaneSpeeds[row]) % frogger.LaneLength;
-                cellOffset = (int)(8.0f * frogger.GameTime * frogger.LaneSpeeds[row]) % cellSize;
+                startPos = frogger.GetLaneOffset(row);
+                cellOffset = frogger.GetCellOffset(row, cellSize);
+               // cellOffset = (int)(8.0f * frogger.GameTime * frogger.LaneSpeeds[row]) % cellSize;
 
-                if (startPos < 0)
-                {
-                    startPos = frogger.LaneLength - (Math.Abs(startPos) % 64);
-                }
+                
 
                 for (byte i = 0; i < frogger.Columns + 2; i++)
                 {
@@ -174,13 +189,13 @@ namespace Frogger
         {
             for(int i = 1; i < frogger.Lives; i++)
             {
-                DrawFrog(cellSize * (frogger.Columns - i), cellSize * frogger.Rows - 1, 1);
+                DrawFrog(cellSize * (frogger.Columns - i), cellSize * (frogger.Rows - 1), 1);
             }
         }
 
         void DrawFrog()
         {
-            DrawFrog(frogger.FrogX * cellSize, frogger.FrogY * cellSize, 1);
+            DrawFrog(frogger.FrogX, frogger.FrogY, (byte)frogger.LastDirection);
         }
 
         void DrawFrog(int x, int y, int frame)
