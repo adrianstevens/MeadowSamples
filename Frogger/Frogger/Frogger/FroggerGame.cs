@@ -64,6 +64,7 @@ namespace Frogger
 
         DateTime gameStart;
         DateTime lastUpdate;
+        DateTime lastMove;
         public void Update()
         {
             var lane = GetFrogLane();
@@ -80,9 +81,9 @@ namespace Frogger
             CheckCollisions();
         }
 
-        public int GetLaneOffset(byte lane)
+        int GetLaneOffset(byte lane, double time)
         {
-            var offset = (int)(GameTime * LaneSpeeds[lane]) % LaneLength;
+            var offset = (int)(time * LaneSpeeds[lane]) % LaneLength;
 
             if (offset < 0)
             {
@@ -90,6 +91,11 @@ namespace Frogger
             }
 
             return offset;
+        }
+
+        public int GetLaneOffset(byte lane)
+        {
+            return GetLaneOffset(lane, GameTime);
         }
 
         public int GetCellOffset(byte lane, byte cellSize)
@@ -103,6 +109,7 @@ namespace Frogger
             {
                 FrogY -= CellSize;
                 LastDirection = Direction.Up;
+                lastMove = DateTime.Now;
             }
         }
 
@@ -112,6 +119,7 @@ namespace Frogger
             {
                 FrogY += CellSize;
                 LastDirection = Direction.Up;//for now
+                lastMove = DateTime.Now;
             }
         }
 
@@ -121,6 +129,7 @@ namespace Frogger
             {
                 FrogX -= CellSize;
                 LastDirection = Direction.Left;
+                lastMove = DateTime.Now;
             }
         }
 
@@ -130,6 +139,7 @@ namespace Frogger
             {
                 FrogX += CellSize;
                 LastDirection = Direction.Right;
+                lastMove = DateTime.Now;
             }
         }
 

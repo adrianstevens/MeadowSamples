@@ -5,9 +5,10 @@
     <AssemblyName>App</AssemblyName>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="Meadow.Foundation" Version="0.15.2" />
+    <PackageReference Include="Meadow.Foundation" Version="0.17.0" />
+    <PackageReference Include="WildernessLabs.Meadow.Assemblies" Version="0.3.2" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Meadow.Foundation.Displays.Ssd1306" Version="0.12.4" />
+    <PackageReference Include="Meadow.Foundation.Displays.Ssd1306" Version="0.12.7" />
   </ItemGroup>
 </Project>
