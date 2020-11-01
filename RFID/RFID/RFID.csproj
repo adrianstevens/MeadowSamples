@@ -6,7 +6,5 @@
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Meadow.Foundation" Version="0.*" />
-    <PackageReference Include="WildernessLabs.Meadow.Assemblies" Version="0.4.0-alpha" />
-    <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
   </ItemGroup>
 </Project>

@@ -24,11 +24,13 @@ namespace MeadowApp
         public MeadowApp()
         {
             Console.WriteLine("Hello Meadow Json serialize");
-
-            TestJsonSerialize();
-            TestJsonDeserialize();
-
             Initialize();
+            onboardLed.SetColor(Color.Orange);
+            TestJsonSerialize();
+            onboardLed.SetColor(Color.Yellow);
+            TestJsonDeserialize();
+            onboardLed.SetColor(Color.Green);
+
         }
 
         void TestJsonDeserialize()
