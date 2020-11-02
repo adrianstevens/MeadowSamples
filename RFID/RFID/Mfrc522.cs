@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Threading;
+using Meadow.Hardware;
 
 namespace RFID
 {
@@ -114,67 +115,31 @@ namespace RFID
         byte _sad = 0; //remove
         bool HIGH = true;
         bool LOW = false;
-        void DigitalWrite(byte sad, bool highLow)
+
+        /// <summary>
+        ///     SPI object
+        /// </summary>
+        protected ISpiPeripheral spiPerihperal;
+
+        protected IDigitalOutputPort resetPort;
+        protected IDigitalOutputPort chipSelectPort;
+
+        /// <summary>
+        ///     Create a new MRFC522 object
+        /// </summary>
+        public Mfrc522(IIODevice device, ISpiBus spiBus, IPin chipSelectPin, IPin resetPin)
         {
-            //temp method to get compiling = 
+            resetPort = device.CreateDigitalOutputPort(resetPin, true);
+            chipSelectPort = device.CreateDigitalOutputPort(chipSelectPin);
+
+            spiPerihperal = new SpiPeripheral(spiBus, chipSelectPort);
+
+            Initialize();
         }
 
-
-        public Mfrc522()
+        void Initialize()
         {
-        }
-
-        void WriteToRegister(byte address, int value)
-        {
-            WriteToRegister(address, (byte)value);
-        }
-
-        void WriteToRegister(byte addr, byte val)
-        {
-         /*   DigitalWrite(_sad, LOW);
-
-            //Address format: 0XXXXXX0
-            SPI.transfer((addr << 1) & 0x7E);
-            SPI.transfer(val);
-
-            DigitalWrite(_sad, HIGH); */
-        }
-
-        byte ReadFromRegister(int address)
-        {
-            return ReadFromRegister((byte)address);
-        }
-
-        byte ReadFromRegister(byte addr)
-        {
-            byte val = 0;
-          /*  DigitalWrite(_sad, LOW);
-            SPI.transfer(((addr << 1) & 0x7E) | 0x80);
-            val = SPI.transfer(0x00);
-            DigitalWrite(_sad, HIGH); */
-            return val; 
-        }
-
-        void SetBitMask(byte address, byte mask)
-        {
-            byte current;
-            current = ReadFromRegister(address);
-            WriteToRegister(address, (byte)(current | mask));
-        }
-
-        /**************************************************************************/
-        void ClearBitMask(byte addr, byte mask)
-        {
-            byte current;
-            current = ReadFromRegister(addr);
-            WriteToRegister(addr, (byte)(current & (~mask)));
-        }
-
-        void Begin()
-        {
-            DigitalWrite(_sad, HIGH);
-
-            reset();
+            Reset();
 
             //Timer: TPrescaler*TreloadVal/6.78MHz = 24ms
             WriteToRegister(TModeReg, 0x8D);       // Tauto=1; f(Timer) = 6.78MHz/TPreScaler
@@ -188,30 +153,57 @@ namespace RFID
             SetBitMask(TxControlReg, 0x03);        // Turn antenna on.
         }
 
-        /**************************************************************************/
-        /*!
-          @brief   Sends a SOFTRESET command to the MFRC522 chip.
-         */
-        /**************************************************************************/
-        void reset()
+        void WriteToRegister(byte address, int value)
+        {
+            WriteToRegister(address, (byte)value);
+        }
+
+        void WriteToRegister(byte address, byte value)
+        {
+            //Address format: 0XXXXXX0
+            //  var ad = (byte)((address << 1) & 0x7E); //seems odd
+            //  spiPerihperal.WriteRegister(ad, value);
+            spiPerihperal.WriteRegister(address, value);
+        }
+
+        byte ReadFromRegister(byte address)
+        {
+            //   var ad = (byte)((address << 1) & 0x7E); //seems odd
+            //   return spiPerihperal.ReadRegister(ad);
+            return spiPerihperal.ReadRegister(address);
+        }
+
+        void SetBitMask(byte address, byte mask)
+        {
+            byte current;
+            current = ReadFromRegister(address);
+            WriteToRegister(address, (byte)(current | mask));
+        }
+
+        void ClearBitMask(byte addr, byte mask)
+        {
+            byte current;
+            current = ReadFromRegister(addr);
+            WriteToRegister(addr, (byte)(current & (~mask)));
+        }
+
+        // Sends a SOFTRESET command to the MFRC522 chip.
+        void Reset()
         {
             WriteToRegister(CommandReg, MFRC522_SOFTRESET);
         }
 
-        /**************************************************************************/
-        /*!
-          @brief   Checks the firmware version of the chip.
-          @returns The firmware version of the MFRC522 chip.
-         */
-        /**************************************************************************/
-        byte getFirmwareVersion()
+        // Checks the firmware version of the chip.
+        public byte GetFirmwareVersion()
         {
             byte response;
             response = ReadFromRegister(VersionReg);
+
+            Console.WriteLine($"Firmware version: {response}");
             return response;
         }
 
-        bool digitalSelfTestPass()
+        public bool DigitalSelfTestPass()
         {
             int i;
             byte n;
@@ -234,7 +226,7 @@ namespace RFID
                           0xDC, 0x15, 0xBA, 0x3E, 0x7D, 0x95, 0x3B, 0x2F};
             byte[] selfTestResult;
 
-            switch (getFirmwareVersion())
+            switch (GetFirmwareVersion())
             {
                 case 0x91:
                     selfTestResult = selfTestResultV1;
@@ -246,7 +238,7 @@ namespace RFID
                     return false;
             }
 
-            reset();
+            Reset();
             WriteToRegister(FIFODataReg, 0x00);
             WriteToRegister(CommandReg, MFRC522_MEM);
             WriteToRegister(AutoTestReg, 0x09);
@@ -272,6 +264,7 @@ namespace RFID
                     return false;
                 }
             }
+            Console.WriteLine("Self test passed");
             return true;
         }
 
@@ -397,7 +390,7 @@ namespace RFID
                    MI_OK         if everything went OK.
          */
         /**************************************************************************/
-        int RequestTag(byte mode, byte[] data)
+        public int RequestTag(byte mode, byte[] data)
         {
             int status;
             int len = 0;
@@ -654,7 +647,7 @@ namespace RFID
                    MI_OK         If the command completed.
          */
         /**************************************************************************/
-        int haltTag()
+        int HaltTag()
         {
             int status, len = 0;
             byte[] buffer = new byte[4];

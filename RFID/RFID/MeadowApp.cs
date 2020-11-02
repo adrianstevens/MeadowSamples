@@ -4,6 +4,7 @@ using Meadow;
 using Meadow.Devices;
 using Meadow.Foundation;
 using Meadow.Foundation.Leds;
+using RFID;
 
 namespace MeadowApp
 {
@@ -14,6 +15,35 @@ namespace MeadowApp
         public MeadowApp()
         {
             Initialize();
+
+            var rf = new Mfrc522(Device, Device.CreateSpiBus(), 
+                Device.Pins.D01, Device.Pins.D00);
+
+            Thread.Sleep(50);
+
+            rf.DigitalSelfTestPass();
+
+            byte[] keyA = { 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF };
+            byte[] keyB = { 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF };
+
+            byte[] data = new byte[16];
+
+            while (true)
+            {
+                var status = rf.RequestTag(0x52, data);
+
+                if (status == 0) //ok
+                {
+                    Console.WriteLine("Found a tag!");
+                }
+                else
+                {
+                    Console.WriteLine($"Status: {status}");
+                }
+
+                Thread.Sleep(250);
+            }
+
             CycleColors(1000);
         }
 
